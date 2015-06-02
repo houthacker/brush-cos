@@ -1,0 +1,130 @@
+
+Class Object Extends %Persistent
+{
+
+Property ObjectID As ObjectID [ Private, Required ];
+
+
+Property UTCTimestamp As %Library.TimeStamp [ Private ];
+
+
+Property ConstructionTime As %Library.TimeStamp [ Private ];
+
+Method %OnNew(
+	ObjectID As ObjectID = "",
+	ObjectType As %String(MAXLEN=16) = "",
+	ClassType As %String = "") As %Status
+{
+	Set sc = ##super()
+	
+	If ($$$ISOK(sc)) {
+		If ( ('$data(ObjectID)) || (ObjectID = $$$NULLOREF)) {
+			If ( ($data(ObjectType)) && (ObjectType '= $$$NULLOREF)) {
+				Set ObjectID = ##class(ObjectID).%New(ObjectType, ClassType)
+			}
+			Else
+			{
+				Set sc = $$$ERROR($$$GeneralError, "Need ObjectType parameter when ObjectID is not given.")
+			}
+		}
+
+		Set:($$$ISOK(sc)) ##this.ObjectID = ObjectID
+		Set:($$$ISOK(sc)) ##this.ConstructionTime = $zdatetime($Ztimestamp, 3, 1)
+		
+		Set a = ##this
+		Set:($$$ISOK(sc)) sc = ##this.ObjectID.AddToSharedObjectList(a)
+	}
+
+	Return sc
+}
+
+Method GetObjectID() As ObjectID
+{
+	Return ##this.ObjectID
+}
+
+Method GetObjectType() As %String(MAXLEN=64)
+{
+	Return ##this.ObjectID.GetObjectType()
+}
+
+Method GetClassType() As %String(MAXLEN=64)
+{
+	Return ##this.ObjectID.GetClassType()
+}
+
+Method GetLabel() As %String(MAXLEN=16)
+{
+	Return ##this.ObjectID.GetLabel()
+}
+
+Method GetDescription() As %String
+{
+	Return ##this.ObjectID.GetDescription()
+}
+
+Method GetTimestamp() As %Library.TimeStamp
+{
+	If (##this.UTCTimestamp '= $$$NULLOREF) {
+		Return ##this.UTCTimestamp
+	}
+	
+	Return ##this.ConstructionTime
+}
+
+Method CreatedOn(UTCTimestamp As %Library.TimeStamp) As %Status
+{
+
+ 	Set sc = $$$OK
+
+ 	If (##this.UTCTimestamp = $$$NULLOREF) {
+ 		Set ##this.UTCTimestamp = UTCTimestamp		
+ 	} else {
+ 		Set sc = $$$ERROR($$$GeneralError, "The UTCTimestamp of an Object can only be set once.")
+ 	}
+
+ 	Return sc
+}
+
+Method SetLabel(Label As %String(MAXLEN=16)) As %Status
+{
+	Set sc = ##this.ObjectID.SetLabel(Label)
+	
+	Return sc
+}
+
+Method SetDescription(Description As %String(MAXLEN=64))
+{
+	Set sc = ##this.ObjectID.SetDescription(Description)
+
+	Return sc
+}
+
+<Storage name="Default">
+<Data name="ObjectDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>InMemoryStorageKey</Value>
+</Value>
+<Value name="3">
+<Value>UTCTimestamp</Value>
+</Value>
+<Value name="4">
+<Value>ConstructionTime</Value>
+</Value>
+<Value name="5">
+<Value>ObjectID</Value>
+</Value>
+</Data>
+<DataLocation>^ObjectD</DataLocation>
+<DefaultData>ObjectDefaultData</DefaultData>
+<ExtentSize>100000</ExtentSize>
+<IdLocation>^ObjectD</IdLocation>
+<IndexLocation>^ObjectI</IndexLocation>
+<SequenceNumber>14</SequenceNumber>
+<StreamLocation>^ObjectS</StreamLocation>
+<Type>%Library.CacheStorage</Type>
+</Storage>
+}
