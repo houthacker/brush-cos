@@ -15,7 +15,7 @@
     "name": "Coen Bijlsma",
     "url": "https://github.com/coenbijlsma"
   },
-  "main": "./lib/brush-scala.js",
+  "main": "./lib/brush-cos.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/coenbijlsma/brush-cos.git"
